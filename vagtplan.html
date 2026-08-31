@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vagtplan — IT Support</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF0EA;
+    --paper-line:#CDD1C4;
+    --card:#FFFFFF;
+    --ink:#1B2420;
+    --ink-soft:#5B6459;
+    --forvagt:#1B5E4F;
+    --forvagt-bg:#E4EEE9;
+    --bagvagt:#A2540F;
+    --bagvagt-bg:#F5E8D9;
+    --free:#8A9088;
+    --warn:#B23A2E;
+    --warn-bg:#F7E4E0;
+    --focus:#2B6CB0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.45;
+    min-height:100vh;
+  }
+  ::selection{ background:#CFE0D9; }
+  a{color:inherit;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:40px 28px 80px;
+  }
+
+  header.top{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:24px;
+    border-bottom:1px solid var(--paper-line);
+    padding-bottom:22px;
+    margin-bottom:34px;
+    flex-wrap:wrap;
+  }
+  header.top h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(28px,4vw,38px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.top p{
+    margin:6px 0 0;
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:46ch;
+  }
+  .roster-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    padding-top:6px;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--paper-line);
+    padding:26px 24px;
+    position:sticky;
+    top:24px;
+  }
+  @media (max-width:860px){ .panel{position:static;} }
+
+  .panel h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  .panel .step-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    display:block;
+    margin-bottom:2px;
+  }
+  .field-group{ margin-bottom:26px; }
+  .field-group:last-of-type{ margin-bottom:0; }
+
+  label{
+    display:block;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:14px 0 5px;
+  }
+  label:first-of-type{ margin-top:14px; }
+
+  input[type=date], select{
+    width:100%;
+    padding:9px 10px;
+    border:1px solid #B9BEB0;
+    background:#fff;
+    color:var(--ink);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+  }
+  .date-row{ display:flex; gap:10px; }
+  .date-row > div{ flex:1; }
+
+  .vac-add-row{
+    display:flex;
+    gap:8px;
+    align-items:flex-end;
+    margin-top:14px;
+  }
+  .vac-add-row > div{ flex:1; }
+
+  button.ghost-btn{
+    background:transparent;
+    border:1px solid var(--ink);
+    color:var(--ink);
+    padding:9px 14px;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    height:38px;
+  }
+  button.ghost-btn:hover{ background:var(--ink); color:#fff; }
+
+  .vac-list{
+    list-style:none;
+    margin:14px 0 0;
+    padding:0;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .vac-list li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    font-size:13px;
+    background:var(--paper);
+    border:1px solid var(--paper-line);
+    padding:7px 10px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .vac-list li button{
+    background:none;
+    border:none;
+    color:var(--warn);
+    cursor:pointer;
+    font-size:15px;
+    line-height:1;
+    padding:0 0 0 6px;
+  }
+  .vac-empty{
+    font-size:13px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:12px;
+  }
+
+  button.primary-btn{
+    width:100%;
+    margin-top:24px;
+    background:var(--ink);
+    color:#fff;
+    border:none;
+    padding:13px 16px;
+    font-size:15px;
+    font-weight:500;
+    cursor:pointer;
+    letter-spacing:0.01em;
+  }
+  button.primary-btn:hover{ background:#333f38; }
+  button.primary-btn:disabled{ background:#A8AEA3; cursor:not-allowed; }
+
+  .error-msg{
+    color:var(--warn);
+    background:var(--warn-bg);
+    border:1px solid #E3B7AE;
+    padding:9px 11px;
+    font-size:13px;
+    margin-top:14px;
+  }
+
+  /* ---- Output side ---- */
+  .output{ min-height:200px; }
+  .empty-state{
+    border:1px dashed var(--paper-line);
+    padding:60px 30px;
+    text-align:center;
+    color:var(--ink-soft);
+  }
+  .empty-state p{ margin:0 auto; max-width:34ch; font-size:15px; }
+  .empty-state .glyph{
+    font-family:'Fraunces', serif;
+    font-size:34px;
+    color:#B9BEB0;
+    display:block;
+    margin-bottom:10px;
+  }
+
+  .output-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .output-head h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:22px;
+    margin:0;
+  }
+  .copy-btn{
+    background:var(--card);
+    border:1px solid var(--ink);
+    color:var(--ink);
+    padding:9px 16px;
+    font-size:13px;
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .copy-btn:hover{ background:var(--ink); color:#fff; }
+  .copy-btn.copied{ background:var(--forvagt); border-color:var(--forvagt); color:#fff; }
+
+  .week-block{ margin-bottom:30px; }
+  .week-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    border-bottom:1px solid var(--paper-line);
+    padding-bottom:8px;
+    margin-bottom:2px;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  table.roster{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14.5px;
+  }
+  table.roster th{
+    text-align:left;
+    font-weight:500;
+    font-size:12px;
+    color:var(--ink-soft);
+    padding:10px 10px 8px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  table.roster td{
+    padding:12px 10px;
+    border-bottom:1px solid var(--paper-line);
+    vertical-align:top;
+  }
+  table.roster tr:last-child td{ border-bottom:1px solid var(--ink); }
+  .day-cell{
+    font-family:'IBM Plex Mono', monospace;
+    white-space:nowrap;
+  }
+  .day-cell .weekday{ display:block; font-weight:500; }
+  .day-cell .datenum{ display:block; color:var(--ink-soft); font-size:12.5px; }
+
+  .role-pill{
+    display:inline-block;
+    padding:3px 9px;
+    font-size:13px;
+    font-weight:500;
+    border-radius:2px;
+  }
+  .role-pill.forvagt{ background:var(--forvagt-bg); color:var(--forvagt); }
+  .role-pill.bagvagt{ background:var(--bagvagt-bg); color:var(--bagvagt); }
+  .free-names{ color:var(--free); font-size:13.5px; }
+  .warn-cell{ color:var(--warn); font-weight:500; font-size:13.5px; }
+
+  .double-tag{
+    font-size:11px;
+    color:var(--warn);
+    display:block;
+    margin-top:2px;
+    font-family:'IBM Plex Sans', sans-serif;
+  }
+
+  .summary{
+    margin-top:36px;
+    border-top:1px solid var(--ink);
+    padding-top:20px;
+  }
+  .summary h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:17px;
+    margin:0 0 14px;
+  }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px,1fr));
+    gap:14px;
+  }
+  .summary-card{
+    border:1px solid var(--paper-line);
+    background:var(--card);
+    padding:14px 16px;
+  }
+  .summary-card .name{
+    font-weight:600;
+    font-size:15px;
+    margin-bottom:8px;
+  }
+  .summary-row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    color:var(--ink-soft);
+    font-family:'IBM Plex Mono', monospace;
+    padding:2px 0;
+  }
+  .summary-row b{ color:var(--ink); font-weight:600; }
+
+  .toast{
+    position:fixed;
+    bottom:24px;
+    left:50%;
+    transform:translateX(-50%) translateY(8px);
+    background:var(--ink);
+    color:#fff;
+    padding:10px 20px;
+    font-size:14px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    .toast, .copy-btn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Vagtplan</h1>
+      <p>DigiSupport vagtplan</p>
+    </div>
+    <div class="roster-tag">4 personer · man–fre</div>
+  </header>
+
+  <div class="layout">
+
+    <!-- CONTROL PANEL -->
+    <div class="panel">
+
+      <div class="field-group">
+        <span class="step-num">01</span>
+        <h2>Vælg periode</h2>
+        <div class="date-row">
+          <div>
+            <label for="startDate">Fra</label>
+            <input type="date" id="startDate">
+          </div>
+          <div>
+            <label for="endDate">Til</label>
+            <input type="date" id="endDate">
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <span class="step-num">02</span>
+        <h2>Fravær</h2>
+        <label for="vacPerson">Marker en person som utilgængelig en given dag — ferie, sygdom eller andet.</label>
+        <div class="vac-add-row">
+          <div>
+            <label for="vacPerson" style="margin-top:0;">Person</label>
+            <select id="vacPerson">
+              <option>Aiden</option>
+              <option>Martin</option>
+              <option>Kris</option>
+              <option>Tina</option>
+            </select>
+          </div>
+          <div>
+            <label for="vacDate" style="margin-top:0;">Dato</label>
+            <input type="date" id="vacDate">
+          </div>
+        </div>
+        <button class="ghost-btn" id="addVacBtn" style="margin-top:10px; width:100%;">Tilføj fravær</button>
+        <ul class="vac-list" id="vacList"></ul>
+        <p class="vac-empty" id="vacEmpty">Ingen fravær tilføjet endnu.</p>
+      </div>
+
+      <button class="primary-btn" id="generateBtn">Lav vagtplan</button>
+      <div id="errorMsg"></div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="output" id="output">
+      <div class="empty-state">
+        <span class="glyph">Forvagt / Bagvagt</span>
+        <p>Vælg en periode til venstre, og planen dukker op her — klar til at kopiere ind i jeres kalender eller chat.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">Plan kopieret — klar til at indsætte i regneark</div>
+
+<script>
+(function(){
+  const PEOPLE = ["Aiden","Martin","Kris","Tina"];
+  const WEEKDAYS_DA = ["Søndag","Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"];
+  const MONTHS_DA = ["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
+
+  const startInput = document.getElementById('startDate');
+  const endInput = document.getElementById('endDate');
+  const vacPersonSel = document.getElementById('vacPerson');
+  const vacDateInput = document.getElementById('vacDate');
+  const addVacBtn = document.getElementById('addVacBtn');
+  const vacList = document.getElementById('vacList');
+  const vacEmpty = document.getElementById('vacEmpty');
+  const generateBtn = document.getElementById('generateBtn');
+  const errorMsgEl = document.getElementById('errorMsg');
+  const outputEl = document.getElementById('output');
+  const toastEl = document.getElementById('toast');
+
+  // default dates: upcoming Monday -> two weeks later Friday
+  function nextMonday(d){
+    const day = d.getDay();
+    const diff = (day === 0) ? 1 : (day === 1 ? 0 : 8 - day);
+    const nd = new Date(d);
+    nd.setDate(d.getDate() + diff);
+    return nd;
+  }
+  function toISO(d){
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  const today = new Date();
+  const defStart = nextMonday(today);
+  const defEnd = new Date(defStart);
+  defEnd.setDate(defStart.getDate() + 11); // ~2 work weeks later (Fri of week 2)
+  startInput.value = toISO(defStart);
+  endInput.value = toISO(defEnd);
+  vacDateInput.value = toISO(defStart);
+
+  let vacations = []; // {person, date: 'YYYY-MM-DD'}
+
+  function renderVacList(){
+    vacList.innerHTML = '';
+    if(vacations.length === 0){
+      vacEmpty.style.display = 'block';
+      return;
+    }
+    vacEmpty.style.display = 'none';
+    vacations
+      .slice()
+      .sort((a,b)=> a.date.localeCompare(b.date))
+      .forEach((v)=>{
+        const li = document.createElement('li');
+        const d = parseISO(v.date);
+        const label = document.createElement('span');
+        label.textContent = v.person + ' — ' + formatShort(d);
+        const rm = document.createElement('button');
+        rm.textContent = '×';
+        rm.setAttribute('aria-label', 'Fjern fravær for ' + v.person);
+        rm.addEventListener('click', ()=>{
+          vacations = vacations.filter(x => !(x.person===v.person && x.date===v.date));
+          renderVacList();
+        });
+        li.appendChild(label);
+        li.appendChild(rm);
+        vacList.appendChild(li);
+      });
+  }
+
+  addVacBtn.addEventListener('click', ()=>{
+    const person = vacPersonSel.value;
+    const date = vacDateInput.value;
+    if(!date) return;
+    const exists = vacations.some(v => v.person===person && v.date===date);
+    if(!exists){
+      vacations.push({person, date});
+      renderVacList();
+    }
+  });
+
+  function parseISO(s){
+    const [y,m,d] = s.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  function formatShort(d){
+    return String(d.getDate()).padStart(2,'0') + '. ' + MONTHS_DA[d.getMonth()];
+  }
+  function isoWeek(d){
+    // ISO 8601 week number
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = (date.getUTCDay() + 6) % 7;
+    date.setUTCDate(date.getUTCDate() - dayNum + 3);
+    const firstThursday = new Date(Date.UTC(date.getUTCFullYear(),0,4));
+    const diff = date - firstThursday;
+    return 1 + Math.round(diff / (7*24*60*60*1000));
+  }
+
+  function buildSchedule(startDate, endDate, vacations){
+    const vacSet = new Set(vacations.map(v => v.person + '|' + v.date));
+    const counts = {}; // total watches
+    const forCounts = {};
+    const bagCounts = {};
+    PEOPLE.forEach(p => { counts[p]=0; forCounts[p]=0; bagCounts[p]=0; });
+
+    const days = [];
+    const cur = new Date(startDate);
+    while(cur <= endDate){
+      const dow = cur.getDay(); // 0 sun .. 6 sat
+      if(dow >= 1 && dow <= 5){
+        const iso = toISO(cur);
+        const available = PEOPLE.filter(p => !vacSet.has(p + '|' + iso));
+
+        let forvagt = null, bagvagt = null, doubled = false, uncovered = false;
+
+        if(available.length >= 2){
+          // pick two lowest total-count people (stable tie-break by original order,
+          // slight rotation using day index to avoid identical ties always going the same way)
+          const ranked = available.slice().sort((a,b)=>{
+            if(counts[a] !== counts[b]) return counts[a]-counts[b];
+            return PEOPLE.indexOf(a) - PEOPLE.indexOf(b);
+          });
+          const chosenTwo = [ranked[0], ranked[1]];
+          // assign forvagt/bagvagt between the two based on role-specific counts
+          if(forCounts[chosenTwo[0]] <= forCounts[chosenTwo[1]]){
+            forvagt = chosenTwo[0]; bagvagt = chosenTwo[1];
+          } else {
+            forvagt = chosenTwo[1]; bagvagt = chosenTwo[0];
+          }
+          // if role counts tie in a way that would always favor same order, re-check bagvagt fairness
+          if(forCounts[forvagt] === forCounts[bagvagt] && bagCounts[forvagt] < bagCounts[bagvagt]){
+            const tmp = forvagt; forvagt = bagvagt; bagvagt = tmp;
+          }
+          counts[forvagt]++; counts[bagvagt]++;
+          forCounts[forvagt]++; bagCounts[bagvagt]++;
+        } else if(available.length === 1){
+          forvagt = available[0]; bagvagt = available[0];
+          doubled = true;
+          counts[forvagt] += 2; forCounts[forvagt]++; bagCounts[forvagt]++;
+        } else {
+          uncovered = true;
+        }
+
+        const free = PEOPLE.filter(p => p!==forvagt && p!==bagvagt);
+
+        days.push({
+          date: new Date(cur),
+          iso,
+          weekday: WEEKDAYS_DA[dow],
+          week: isoWeek(cur),
+          forvagt, bagvagt, doubled, uncovered,
+          free: uncovered ? PEOPLE.filter(p=>available.includes(p)) : free,
+          unavailableToday: PEOPLE.filter(p => vacSet.has(p + '|' + iso))
+        });
+      }
+      cur.setDate(cur.getDate()+1);
+    }
+    return { days, counts, forCounts, bagCounts };
+  }
+
+  function groupByWeek(days){
+    const groups = [];
+    let currentWeek = null, currentGroup = null;
+    days.forEach(d => {
+      if(d.week !== currentWeek){
+        currentWeek = d.week;
+        currentGroup = { week: d.week, days: [] };
+        groups.push(currentGroup);
+      }
+      currentGroup.days.push(d);
+    });
+    return groups;
+  }
+
+  function renderSchedule(result, startDate, endDate){
+    const { days, counts, forCounts, bagCounts } = result;
+
+    if(days.length === 0){
+      outputEl.innerHTML = '<div class="error-msg">Perioden indeholder ingen hverdage. Vælg en periode der dækker mindst én mandag–fredag.</div>';
+      return;
+    }
+
+    const weeks = groupByWeek(days);
+    let html = '';
+
+    html += '<div class="output-head"><h2>Vagtplan</h2><button class="copy-btn" id="copyBtn">Kopiér til Outlook</button></div>';
+
+    weeks.forEach(w => {
+      const first = w.days[0], last = w.days[w.days.length-1];
+      html += '<div class="week-block">';
+      html += '<div class="week-label"><span>Uge ' + w.week + '</span><span>' + formatShort(first.date) + '–' + formatShort(last.date) + '</span></div>';
+      html += '<table class="roster"><thead><tr><th>Dag</th><th>Forvagt</th><th>Bagvagt</th><th>Fri</th></tr></thead><tbody>';
+      w.days.forEach(d => {
+        html += '<tr>';
+        html += '<td class="day-cell"><span class="weekday">' + d.weekday + '</span><span class="datenum">' + formatShort(d.date) + '</span></td>';
+        if(d.uncovered){
+          html += '<td colspan="2" class="warn-cell">Ingen tilgængelige — vagt kan ikke dækkes</td>';
+          html += '<td class="free-names">' + (d.free.join(', ') || '—') + '</td>';
+        } else {
+          html += '<td><span class="role-pill forvagt">' + d.forvagt + '</span>' + (d.doubled ? '<span class="double-tag">Dækker begge vagter</span>' : '') + '</td>';
+          html += '<td><span class="role-pill bagvagt">' + d.bagvagt + '</span></td>';
+          html += '<td class="free-names">' + (d.free.length ? d.free.join(', ') : '—') + '</td>';
+        }
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    });
+
+    // summary
+    html += '<div class="summary"><h3>Fordeling i perioden</h3><div class="summary-grid">';
+    PEOPLE.forEach(p => {
+      html += '<div class="summary-card"><div class="name">' + p + '</div>';
+      html += '<div class="summary-row"><span>Forvagt</span><b>' + forCounts[p] + '</b></div>';
+      html += '<div class="summary-row"><span>Bagvagt</span><b>' + bagCounts[p] + '</b></div>';
+      html += '<div class="summary-row"><span>I alt</span><b>' + counts[p] + '</b></div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+
+    outputEl.innerHTML = html;
+
+    document.getElementById('copyBtn').addEventListener('click', ()=>{
+      const emailHtml = buildEmailHtml(weeks);
+      const emailPlain = buildEmailPlain(weeks);
+      const btn = document.getElementById('copyBtn');
+      const markCopied = ()=>{
+        showToast();
+        btn.textContent = 'Kopieret ✓';
+        btn.classList.add('copied');
+        setTimeout(()=>{ btn.textContent = 'Kopiér til Outlook'; btn.classList.remove('copied'); }, 1800);
+      };
+      copyRichToClipboard(emailHtml, emailPlain).then(markCopied).catch(()=>{
+        legacyRichCopy(emailHtml).then(markCopied).catch(()=>{
+          showManualCopyBox(emailHtml);
+        });
+      });
+    });
+  }
+
+  // Builds an HTML table using only inline styles and old-school attributes
+  // (bgcolor, border, cellpadding) — this is what Outlook's rendering engine
+  // (based on Word) actually respects when a table is pasted into an email.
+  function buildEmailHtml(weeks){
+    const font = "font-family:Calibri,Arial,Helvetica,sans-serif;";
+    const thStyle = font + "border:1px solid #999999;background-color:#1B2420;color:#ffffff;padding:6px 10px;text-align:left;font-size:13px;";
+    const tdStyle = font + "border:1px solid #999999;padding:6px 10px;font-size:13px;";
+    const weekRowStyle = font + "border:1px solid #999999;background-color:#EEF0EA;padding:7px 10px;font-size:13px;font-weight:bold;";
+    const warnStyle = font + "border:1px solid #999999;padding:6px 10px;font-size:13px;color:#B23A2E;font-weight:bold;";
+
+    let rows = '';
+    weeks.forEach(w => {
+      const wf = w.days[0], wl = w.days[w.days.length-1];
+      rows += '<tr><td colspan="4" style="' + weekRowStyle + '" bgcolor="#EEF0EA">Uge ' + w.week + ' &middot; ' + formatShort(wf.date) + '&ndash;' + formatShort(wl.date) + '</td></tr>';
+      w.days.forEach(d => {
+        if(d.uncovered){
+          rows += '<tr>' +
+            '<td style="' + tdStyle + '">' + d.weekday + '</td>' +
+            '<td style="' + tdStyle + '">' + formatShort(d.date) + '</td>' +
+            '<td colspan="2" style="' + warnStyle + '">Ingen dækning</td>' +
+          '</tr>';
+        } else if(d.doubled){
+          rows += '<tr>' +
+            '<td style="' + tdStyle + '">' + d.weekday + '</td>' +
+            '<td style="' + tdStyle + '">' + formatShort(d.date) + '</td>' +
+            '<td colspan="2" style="' + tdStyle + '"><b>' + d.forvagt + '</b> &ndash; dækker begge vagter</td>' +
+          '</tr>';
+        } else {
+          rows += '<tr>' +
+            '<td style="' + tdStyle + '">' + d.weekday + '</td>' +
+            '<td style="' + tdStyle + '">' + formatShort(d.date) + '</td>' +
+            '<td style="' + tdStyle + '">' + d.forvagt + '</td>' +
+            '<td style="' + tdStyle + '">' + d.bagvagt + '</td>' +
+          '</tr>';
+        }
+      });
+    });
+
+    return '<table style="' + font + 'border-collapse:collapse;width:100%;max-width:560px;" cellpadding="0" cellspacing="0" border="0">' +
+      '<thead><tr>' +
+        '<th style="' + thStyle + '" bgcolor="#1B2420">Dag</th>' +
+        '<th style="' + thStyle + '" bgcolor="#1B2420">Dato</th>' +
+        '<th style="' + thStyle + '" bgcolor="#1B2420">Forvagt</th>' +
+        '<th style="' + thStyle + '" bgcolor="#1B2420">Bagvagt</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
+  }
+
+  // Plain-text fallback carried alongside the HTML — used by mail/chat clients
+  // that don't accept rich paste.
+  function buildEmailPlain(weeks){
+    let lines = [];
+    weeks.forEach(w => {
+      const wf = w.days[0], wl = w.days[w.days.length-1];
+      lines.push('UGE ' + w.week + ' (' + formatShort(wf.date) + '–' + formatShort(wl.date) + ')');
+      w.days.forEach(d => {
+        if(d.uncovered) lines.push('  ' + d.weekday + ' ' + formatShort(d.date) + ': Ingen dækning');
+        else if(d.doubled) lines.push('  ' + d.weekday + ' ' + formatShort(d.date) + ': ' + d.forvagt + ' (begge vagter)');
+        else lines.push('  ' + d.weekday + ' ' + formatShort(d.date) + ': Forvagt ' + d.forvagt + ' / Bagvagt ' + d.bagvagt);
+      });
+      lines.push('');
+    });
+    return lines.join('\n').trim();
+  }
+
+  let toastTimer;
+  function showToast(msg){
+    toastEl.textContent = msg || 'Plan kopieret — klar til at indsætte i Outlook';
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> toastEl.classList.remove('show'), 2200);
+  }
+
+  // 1) Modern rich-clipboard write (HTML + plain-text fallback in one go).
+  function copyRichToClipboard(html, plain){
+    if(navigator.clipboard && window.ClipboardItem && window.isSecureContext){
+      try{
+        const item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([plain], {type:'text/plain'})
+        });
+        return navigator.clipboard.write([item]);
+      }catch(e){
+        return Promise.reject(e);
+      }
+    }
+    return Promise.reject(new Error('Clipboard.write unavailable'));
+  }
+
+  // 2) Legacy fallback: render the table into a hidden editable element,
+  // select it with the Selection API, and let execCommand('copy') carry the
+  // formatting — works in many places where Clipboard.write is blocked.
+  function legacyRichCopy(html){
+    return new Promise((resolve, reject)=>{
+      const container = document.createElement('div');
+      container.setAttribute('contenteditable', 'true');
+      container.style.position = 'fixed';
+      container.style.top = '-9999px';
+      container.style.left = '-9999px';
+      container.innerHTML = html;
+      document.body.appendChild(container);
+      const range = document.createRange();
+      range.selectNodeContents(container);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      let ok = false;
+      try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+      sel.removeAllRanges();
+      document.body.removeChild(container);
+      ok ? resolve() : reject(new Error('legacy rich copy failed'));
+    });
+  }
+
+  // 3) Last resort: render the real table on the page so the person can
+  // select it by hand and copy it themselves — this still carries formatting
+  // because it's an actual table, not a text dump.
+  function showManualCopyBox(html){
+    let box = document.getElementById('manualCopyBox');
+    if(!box){
+      box = document.createElement('div');
+      box.id = 'manualCopyBox';
+      box.style.marginTop = '18px';
+      box.innerHTML =
+        '<label style="margin:0 0 8px;">Automatisk kopiering er blokeret her — marker tabellen herunder og tryk Ctrl+C (Cmd+C på Mac), indsæt derefter i din e-mail:</label>' +
+        '<div id="manualCopyArea" contenteditable="true" style="border:1px solid #B9BEB0; background:#fff; padding:14px; overflow:auto;"></div>';
+      outputEl.appendChild(box);
+    }
+    document.getElementById('manualCopyArea').innerHTML = html;
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  generateBtn.addEventListener('click', ()=>{
+    errorMsgEl.innerHTML = '';
+    const sVal = startInput.value, eVal = endInput.value;
+    if(!sVal || !eVal){
+      errorMsgEl.innerHTML = '<div class="error-msg">Vælg både startdato og slutdato.</div>';
+      return;
+    }
+    const start = parseISO(sVal), end = parseISO(eVal);
+    if(end < start){
+      errorMsgEl.innerHTML = '<div class="error-msg">Slutdatoen skal ligge efter startdatoen.</div>';
+      return;
+    }
+    const span = (end - start) / (1000*60*60*24);
+    if(span > 120){
+      errorMsgEl.innerHTML = '<div class="error-msg">Vælg en periode på maks. ca. 17 uger ad gangen.</div>';
+      return;
+    }
+    const result = buildSchedule(start, end, vacations);
+    renderSchedule(result, start, end);
+  });
+
+  renderVacList();
+})();
+</script>
+
+</body>
+</html>
