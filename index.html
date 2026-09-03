@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vagtplan — IT Support</title>
+<title>Digi Tool - Vagtplan</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -371,8 +371,8 @@
 
   <header class="top">
     <div>
-      <h1>Vagtplan</h1>
-      <p>DigiSupport vagtplan</p>
+      <h1>Vagtplan Generator</h1>
+      <p>One thing less, to fiddle with.</p>
     </div>
     <div class="roster-tag">4 personer · man–fre</div>
   </header>
@@ -443,18 +443,21 @@
     <div class="output" id="output">
       <div class="empty-state">
         <span class="glyph">Forvagt / Bagvagt</span>
-        <p>Vælg en periode til venstre, og planen dukker op her — klar til at kopiere ind i jeres kalender eller chat.</p>
+        <p>Vælg en periode til venstre, og planen dukker op her — klar til at kopiere ind i en mail.</p>
       </div>
     </div>
 
   </div>
 </div>
 
-<div class="toast" id="toast">Plan kopieret — klar til at indsætte i regneark</div>
+<div class="toast" id="toast">Plan kopieret — klar til at indsætte i mail!</div>
 
 <script>
 (function(){
   const PEOPLE = ["Aiden","Martin","Kris","Tina"];
+  // Permanent site grouping — the two watches should land at different
+  // locations whenever both have someone available that day.
+  const LOCATION = { Aiden:'A', Tina:'A', Martin:'B', Kris:'B' };
   const WEEKDAYS_DA = ["Søndag","Mandag","Tirsdag","Onsdag","Torsdag","Fredag","Lørdag"];
   const MONTHS_DA = ["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
 
@@ -601,8 +604,16 @@
         const forvagtPool = availableForWatch.filter(p => !(isFriday && p === 'Tina'));
         const forvagt = pickLowest(forvagtPool, forCounts);
 
-        // Bagvagt comes from whoever's left (nobody covers both roles the same day).
-        const bagvagtPool = availableForWatch.filter(p => p !== forvagt);
+        // Bagvagt comes from whoever's left. Prefer the *other* location from
+        // Forvagt so the two watches sit at different sites; only fall back to
+        // the same location if nobody at the other location is available today.
+        let bagvagtPool = availableForWatch.filter(p => p !== forvagt);
+        if(forvagt){
+          const oppositeLocationPool = bagvagtPool.filter(p => LOCATION[p] !== LOCATION[forvagt]);
+          if(oppositeLocationPool.length > 0){
+            bagvagtPool = oppositeLocationPool;
+          }
+        }
         const bagvagt = pickLowest(bagvagtPool, bagCounts);
 
         if(forvagt){
