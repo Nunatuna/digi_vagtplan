@@ -670,7 +670,7 @@
       const first = w.days[0], last = w.days[w.days.length-1];
       html += '<div class="week-block">';
       html += '<div class="week-label"><span>Uge ' + w.week + '</span><span>' + formatShort(first.date) + '–' + formatShort(last.date) + '</span></div>';
-      html += '<table class="roster"><thead><tr><th>Dag</th><th>Forvagt</th><th>Bagvagt</th><th>Fri</th></tr></thead><tbody>';
+      html += '<table class="roster"><thead><tr><th>Dag</th><th>Forvagt</th><th>Bagvagt</th><th>Fri leg</th></tr></thead><tbody>';
       w.days.forEach(d => {
         html += '<tr>';
         html += '<td class="day-cell"><span class="weekday">' + d.weekday + '</span><span class="datenum">' + formatShort(d.date) + '</span></td>';
